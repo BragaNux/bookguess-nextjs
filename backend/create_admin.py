@@ -9,12 +9,16 @@ from app.models.user import User
 from app.services.auth_service import hash_password
 
 def create_admin():
+    # As credenciais vêm do ambiente (veja o .env.example), nunca do código.
+    username = os.getenv("ADMIN_USERNAME")
+    email = os.getenv("ADMIN_EMAIL")
+    password = os.getenv("ADMIN_PASSWORD")
+    if not (username and email and password):
+        print("Defina ADMIN_USERNAME, ADMIN_EMAIL e ADMIN_PASSWORD no ambiente antes de rodar este script.")
+        sys.exit(1)
+
     db = SessionLocal()
     try:
-        username = "brayan"
-        email = "brayan@panela.host"
-        password = "BookGuessSecurePassword2026!"
-        
         user = db.query(User).filter(User.username == username).first()
         if user:
             print(f"Usuário '{username}' já existe. Atualizando privilégios e senha...")
@@ -38,7 +42,6 @@ def create_admin():
         print("Sucesso! Conta de administrador configurada com sucesso.")
         print(f"Username: {username}")
         print(f"E-mail: {email}")
-        print(f"Senha: {password}")
     except Exception as e:
         db.rollback()
         print(f"Erro ao criar administrador: {e}")
